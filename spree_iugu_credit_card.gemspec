@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.require_path = 'lib'
   s.requirements << 'none'
 
-  s.add_dependency 'spree_core', '~> 3.1.3'
+  s.add_dependency 'spree_core', '~> 3.1.0'
   s.add_dependency 'iugu', '~> 1.0.8'
 
   s.add_development_dependency 'poltergeist', '~> 1.5.0'
