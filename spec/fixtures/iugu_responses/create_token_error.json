@@ -1,0 +1,14 @@
+{
+  "method":"credit_card",
+  "extra_info":
+  {
+    "brand":"VISA",
+    "holder_name":"teste cartao",
+    "display_number":"XXXX-XXXX-XXXX-1111",
+    "bin":"411111",
+    "month":10,
+    "year":2019
+  },
+  "test":true,
+  "errors": "Erro ao criar token"
+}

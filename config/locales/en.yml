@@ -1,0 +1,17 @@
+en:
+  spree:
+    api_key: API Key
+    maximum_portions: Maximum Portions Available
+    minimum_value: Minimum Value per Portion
+    portions_without_tax: Portions without Tax
+    tax_value: Tax Value
+    portion: Portion
+    portions: Portions
+    iugu_without_tax: without tax
+    iugu_with_tax: with tax
+    iugu_portion_item: "%{times}x of %{value}"
+    shipment_total: Shipment Total
+    iugu_credit_card_success: Transaction purchased successfully
+    iugu_credit_card_void: Transaction voided successfully
+    iugu_credit_card_cancel: Transaction canceled successfully
+    iugu_credit_card_portion: Portion is required

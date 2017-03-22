@@ -1,0 +1,10 @@
+{
+  "message":"Autorizado",
+  "errors":{},
+  "success":true,
+  "url":"https://faturas.iugu.com/abc001",
+  "pdf":"https://faturas.iugu.com/abc001.pdf",
+  "identification":null,
+  "invoice_id":"ABCDEFGHIJKLMNOPQRSTUVWXYZ000001",
+  "LR":"00"
+}
