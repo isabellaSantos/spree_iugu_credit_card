@@ -1,0 +1,18 @@
+pt-BR:
+  spree:
+    api_key: API Token
+    account_id: ID da Conta
+    maximum_portions: "Número máximo de parcelas disponível"
+    minimum_value: "Valor mínimo por parcela"
+    portions_without_tax: "Número de parcelas sem juros"
+    tax_value: "Valor do juros (% a.m.)"
+    portion: Parcela
+    portions: Parcelas
+    iugu_without_tax: sem juros
+    iugu_with_tax: com juros
+    iugu_portion_item: "%{times}x de %{value}"
+    shipment_total: Valor do frete
+    iugu_credit_card_success: "Transação autorizado com sucesso"
+    iugu_credit_card_void: "Transação estornada com sucesso"
+    iugu_credit_card_cancel: "Transação cancelada com sucesso"
+    iugu_credit_card_portion: "Número de parcelas é requerido"

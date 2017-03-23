@@ -1,6 +1,7 @@
 en:
   spree:
     api_key: API Key
+    account_id: Account ID
     maximum_portions: Maximum Portions Available
     minimum_value: Minimum Value per Portion
     portions_without_tax: Portions without Tax
