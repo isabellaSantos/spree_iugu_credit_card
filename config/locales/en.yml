@@ -6,11 +6,14 @@ en:
     minimum_value: Minimum Value per Portion
     portions_without_tax: Portions without Tax
     tax_value: Tax Value
+    min_value_without_tax: Minium value without tax
     portion: Portion
     portions: Portions
     iugu_without_tax: without tax
     iugu_with_tax: with tax
     iugu_portion_item: "%{times}x of %{value}"
+    iugu_portion_item_with_tax: "%{times}x of %{value} (%{total})"
+    iugu_portion_item_without_tax: "%{times}x of %{value} without tax"
     shipment_total: Shipment Total
     iugu_credit_card_success: Transaction purchased successfully
     iugu_credit_card_void: Transaction voided successfully

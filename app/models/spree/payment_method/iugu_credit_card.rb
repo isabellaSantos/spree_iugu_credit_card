@@ -7,7 +7,8 @@ module Spree
     preference :maximum_portions, :integer, default: 12
     preference :minimum_value, :decimal, default: 0.0
     preference :portions_without_tax, :integer, default: 1
-    preference :tax_value, :decimal, default: 0.0
+    preference :min_value_without_tax, :decimal, default: 0.0
+    preference :tax_value_per_months, :hash, default: {}
 
     def auto_capture
       true
@@ -157,16 +158,14 @@ module Spree
       ret = []
       portions_number = preferred_maximum_portions
       minimum_value = preferred_minimum_value
-      tax = preferred_tax_value
 
-      ret.push({portion: 1, value: amount, total: amount, tax_message: :iugu_without_tax})
-
-      (2..portions_number).each do |number|
-        if tax <= 0 or number <= preferred_portions_without_tax
-          value = amount / number
+      (1..portions_number).each do |number|
+        tax = preferred_tax_value_per_months[number.to_s].to_f || 0.0
+        if tax <= 0 or (number <= preferred_portions_without_tax and amount >= preferred_min_value_without_tax)
+          value = amount.to_f / number
           tax_message = :iugu_without_tax
         else
-          value = (amount * ((1 + tax / 100) ** number)) / number
+          value = (amount.to_f * ((1 + tax / 100) ** number)) / number
           tax_message = :iugu_with_tax
         end
 

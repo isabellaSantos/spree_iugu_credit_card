@@ -6,11 +6,14 @@ pt-BR:
     minimum_value: "Valor mínimo por parcela"
     portions_without_tax: "Número de parcelas sem juros"
     tax_value: "Valor do juros (% a.m.)"
+    min_value_without_tax: "Valor mínimo para parcelas sem juros"
     portion: Parcela
     portions: Parcelas
     iugu_without_tax: sem juros
     iugu_with_tax: com juros
-    iugu_portion_item: "%{times}x de %{value}"
+    iugu_portion_item: "%{times} parcelas de %{value}"
+    iugu_portion_item_with_tax: "%{times} parcelas de %{value} (%{total})"
+    iugu_portion_item_without_tax: "%{times} parcelas de %{value} sem juros"
     shipment_total: Valor do frete
     iugu_credit_card_success: "Transação autorizado com sucesso"
     iugu_credit_card_void: "Transação estornada com sucesso"
