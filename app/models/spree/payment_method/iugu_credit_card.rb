@@ -23,13 +23,14 @@ module Spree
     end
 
     def purchase(amount, source, *args)
-      return ActiveMerchant::Billing::Response.new(false, Spree.t(:iugu_credit_card_portion), {}, authorization: '') if source.portions.nil?
-
       Iugu.api_key = preferred_api_key
       gateway_options = args.first
       billing_address = gateway_options[:billing_address]
       order_number, payment_number = gateway_options[:order_id].split('-')
       order = Spree::Order.friendly.find order_number
+
+      errors = check_required_attributes(source, order)
+      return errors if errors.present?
 
       # Create token
       name = source.name.split(' ')
@@ -175,6 +176,11 @@ module Spree
         end
       end
       ret
+    end
+
+    def check_required_attributes(source, order)
+      return ActiveMerchant::Billing::Response.new(false, Spree.t(:iugu_credit_card_portion), {}, authorization: '') if source.portions.nil?
+      nil
     end
 
   end
