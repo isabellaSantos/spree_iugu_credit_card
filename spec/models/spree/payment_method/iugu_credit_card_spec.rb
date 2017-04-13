@@ -156,11 +156,11 @@ describe Spree::PaymentMethod::IuguCreditCard, type: :model do
       portions = object.portions_options 100
 
       expect(portions[0]).to eq({portion: 1, value: 100.0, total: 100.0, tax_message: :iugu_without_tax})
-      expect(portions[1]).to eq({portion: 2, value: 51.005, total: 102.01, tax_message: :iugu_with_tax})
-      expect(portions[2]).to eq({portion: 3, value: 34.85594583333332, total: 104.56783749999997, tax_message: :iugu_with_tax})
-      expect(portions[3]).to eq({portion: 4, value: 27.060804, total: 108.243216, tax_message: :iugu_with_tax})
-      expect(portions[4]).to eq({portion: 5, value: 22.62816425781249, total: 113.14082128906244, tax_message: :iugu_with_tax})
-      expect(portions[5]).to eq({portion: 6, value: 19.90087160881667, total: 119.4052296529, tax_message: :iugu_with_tax})
+      expect(portions[1]).to eq({portion: 2, value: 50.5, total: 101.00, tax_message: :iugu_with_tax})
+      expect(portions[2]).to eq({portion: 3, value: 33.833333333333336, total: 101.5, tax_message: :iugu_with_tax})
+      expect(portions[3]).to eq({portion: 4, value: 25.5, total: 102.0, tax_message: :iugu_with_tax})
+      expect(portions[4]).to eq({portion: 5, value: 20.5, total: 102.5, tax_message: :iugu_with_tax})
+      expect(portions[5]).to eq({portion: 6, value: 17.166666666666668, total: 103.0, tax_message: :iugu_with_tax})
     end
   end
 

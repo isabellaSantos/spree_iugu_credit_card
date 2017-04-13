@@ -107,9 +107,27 @@ module Spree
           }
         end
 
+        # Check portion value and create an adjustment if necessary
+        portions_value = portions_options(order.total)
+        selected_portion = portions_value[source.portions - 1]
+        if selected_portion[:total] > order.total
+          adjustment = Spree::Adjustment.create(adjustable: order,
+                                                amount: (selected_portion[:total] - order.total),
+                                                label: Spree.t(:iugu_cc_adjustment_tax),
+                                                eligible: true,
+                                                order: order)
+          params[:items] << {
+            description: adjustment.label,
+            quantity: 1,
+            price_cents: adjustment.display_amount.cents
+          }
+        end
+
         charge = Iugu::Charge.create(params)
 
         if charge.errors.present?
+          adjustment.destroy if adjustment.present?
+
           if charge.errors.is_a?(Hash)
             message = charge.errors.inject(Array.new) { |arr, i| arr += i[1] }.join('. ')
           else
@@ -117,6 +135,11 @@ module Spree
           end
           ActiveMerchant::Billing::Response.new(false, message, {}, authorization: '')
         else
+          if adjustment.present?
+            order.updater.update
+            payment = Spree::Payment.friendly.find payment_number
+            payment.update_attributes(amount: order.total)
+          end
           ActiveMerchant::Billing::Response.new(true, Spree.t("iugu_credit_card_success"), {}, authorization: charge.invoice_id)
         end
       end
@@ -166,7 +189,7 @@ module Spree
           value = amount.to_f / number
           tax_message = :iugu_without_tax
         else
-          value = (amount.to_f * ((1 + tax / 100) ** number)) / number
+          value = (amount.to_f + (amount.to_f * tax / 100)) / number
           tax_message = :iugu_with_tax
         end
 

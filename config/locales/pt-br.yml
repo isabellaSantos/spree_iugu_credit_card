@@ -19,3 +19,4 @@ pt-BR:
     iugu_credit_card_void: "Transação estornada com sucesso"
     iugu_credit_card_cancel: "Transação cancelada com sucesso"
     iugu_credit_card_portion: "Número de parcelas é requerido"
+    iugu_cc_adjustment_tax: Juros do Cartão de Crédito
