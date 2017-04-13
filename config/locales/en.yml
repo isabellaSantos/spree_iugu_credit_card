@@ -20,3 +20,5 @@ en:
     iugu_credit_card_cancel: Transaction canceled successfully
     iugu_credit_card_portion: Portion is required
     iugu_cc_adjustment_tax: Credit Card Tax
+    iugu_error:
+      credit_card_invalid: The credit card number is invalid

@@ -53,9 +53,12 @@ module Spree
 
       if token.errors.present?
         if token.errors.is_a? Hash
-          message = token.errors.inject(Array.new) { |arr, i| arr += i[1] }.join('. ')
+          arr_messages = token.errors.inject(Array.new) { |arr, i| arr += i[1] }
+          message = arr_messages.map { |m| translate_error(m) }.join('. ')
+        elsif token.errors.is_a? Array
+          message = token.errors.map { |e| translate_error(e) }.join('. ')
         else
-          message = token.errors
+          message = translate_error(token.errors)
         end
         return ActiveMerchant::Billing::Response.new(false, message, {}, authorization: '')
       else
@@ -129,9 +132,12 @@ module Spree
           adjustment.destroy if adjustment.present?
 
           if charge.errors.is_a?(Hash)
-            message = charge.errors.inject(Array.new) { |arr, i| arr += i[1] }.join('. ')
+            arr_messages = charge.errors.inject(Array.new) { |arr, i| arr += i[1] }
+            message = arr_messages.map { |m| translate_error(m) }.join('. ')
+          elsif charge.errors.is_a? Array
+            message = charge.errors.map { |e| translate_error(e) }.join('. ')
           else
-            message = charge.errors
+            message = translate_error(charge.errors)
           end
           ActiveMerchant::Billing::Response.new(false, message, {}, authorization: '')
         else
@@ -204,6 +210,14 @@ module Spree
     def check_required_attributes(source, order)
       return ActiveMerchant::Billing::Response.new(false, Spree.t(:iugu_credit_card_portion), {}, authorization: '') if source.portions.nil?
       nil
+    end
+
+    def translate_error(error)
+      errors = {
+        'is not a valid credit card number' => Spree.t('iugu_error.credit_card_invalid')
+      }
+
+      errors[error].present? ? errors[error] : error
     end
 
   end
