@@ -20,5 +20,6 @@ pt-BR:
     iugu_credit_card_cancel: "Transação cancelada com sucesso"
     iugu_credit_card_portion: "Número de parcelas é requerido"
     iugu_cc_adjustment_tax: Juros do Cartão de Crédito
+    iugu_credit_card_failure: "Infelizmente o seu pagamento não foi aprovado pela operadora de cartão. Tente com outro cartão ou com boleto bancário."
     iugu_error:
       credit_card_invalid: "Cartão de crédito inválido"

@@ -141,12 +141,17 @@ module Spree
           end
           ActiveMerchant::Billing::Response.new(false, message, {}, authorization: '')
         else
-          if adjustment.present?
-            order.updater.update
-            payment = Spree::Payment.friendly.find payment_number
-            payment.update_attributes(amount: order.total)
+          invoice = Iugu::Invoice.fetch(charge.invoice_id)
+          if invoice.status == 'paid'
+            if adjustment.present?
+              order.updater.update
+              payment = Spree::Payment.friendly.find payment_number
+              payment.update_attributes(amount: order.total)
+            end
+            ActiveMerchant::Billing::Response.new(true, Spree.t("iugu_credit_card_success"), {}, authorization: charge.invoice_id)
+          else
+            ActiveMerchant::Billing::Response.new(false, Spree.t("iugu_credit_card_failure"), {}, authorization: charge.invoice_id)
           end
-          ActiveMerchant::Billing::Response.new(true, Spree.t("iugu_credit_card_success"), {}, authorization: charge.invoice_id)
         end
       end
     end
