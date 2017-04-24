@@ -125,7 +125,7 @@ module Spree
             price_cents: adjustment.display_amount.cents
           }
         end
-        
+
         charge = Iugu::Charge.create(params)
 
         if charge.errors.present?
@@ -155,7 +155,7 @@ module Spree
         end
       end
     rescue => e
-      deal_with_exception(e)
+      deal_with_exception(source, e)
       ActiveMerchant::Billing::Response.new(false, Spree.t('iugu_credit_card_error'), {}, {})
     end
 
@@ -228,7 +228,7 @@ module Spree
       errors[error].present? ? errors[error] : error
     end
 
-    def deal_with_exception(error)
+    def deal_with_exception(source, error)
     end
 
   end
