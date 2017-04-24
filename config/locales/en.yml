@@ -21,5 +21,6 @@ en:
     iugu_credit_card_portion: Portion is required
     iugu_cc_adjustment_tax: Credit Card Tax
     iugu_credit_card_failure: Transaction failure
+    iugu_credit_card_error: Transaction failure
     iugu_error:
       credit_card_invalid: The credit card number is invalid
