@@ -124,12 +124,16 @@ module Spree
             quantity: 1,
             price_cents: adjustment.display_amount.cents
           }
+          order.updater.update
         end
 
         charge = Iugu::Charge.create(params)
 
         if charge.errors.present?
-          adjustment.destroy if adjustment.present?
+          if adjustment.present?
+            adjustment.destroy
+            order.updater.update
+          end
 
           if charge.errors.is_a?(Hash)
             arr_messages = charge.errors.inject(Array.new) { |arr, i| arr += i[1] }
@@ -143,11 +147,7 @@ module Spree
         else
           invoice = Iugu::Invoice.fetch(charge.invoice_id)
           if invoice.status == 'paid'
-            if adjustment.present?
-              order.updater.update
-              payment = Spree::Payment.friendly.find payment_number
-              payment.update_attributes(amount: order.total)
-            end
+            save_order_total(order, payment_number) if adjustment.present?
             ActiveMerchant::Billing::Response.new(true, Spree.t("iugu_credit_card_success"), {}, authorization: charge.invoice_id)
           else
             ActiveMerchant::Billing::Response.new(false, Spree.t("iugu_credit_card_failure"), {}, authorization: charge.invoice_id)
@@ -155,6 +155,18 @@ module Spree
         end
       end
     rescue => e
+      user_invoices = Iugu::Invoice.search(query: "email = '#{gateway_options[:email]}'").results
+      user_invoices.each do |user_invoice|
+        if user_invoice.status == 'paid' && user_invoice.total_cents == order.display_total.cents
+          next if user_invoice.items.size != params[:items].size
+          save_order_total(order, payment_number) if adjustment.present?
+          return ActiveMerchant::Billing::Response.new(true, Spree.t("iugu_credit_card_success"), {}, authorization: user_invoice.id)
+        end
+      end
+      if adjustment.present?
+        adjustment.destroy
+        order.updater.update
+      end
       deal_with_exception(source, e)
       ActiveMerchant::Billing::Response.new(false, Spree.t('iugu_credit_card_error'), {}, {})
     end
@@ -226,6 +238,11 @@ module Spree
       }
 
       errors[error].present? ? errors[error] : error
+    end
+
+    def save_order_total(order, payment_number)
+      payment = Spree::Payment.friendly.find payment_number
+      payment.update_attributes(amount: order.total)
     end
 
     def deal_with_exception(source, error)
