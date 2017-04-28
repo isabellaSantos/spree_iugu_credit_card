@@ -150,6 +150,10 @@ module Spree
             save_order_total(order, payment_number) if adjustment.present?
             ActiveMerchant::Billing::Response.new(true, Spree.t("iugu_credit_card_success"), {}, authorization: charge.invoice_id)
           else
+            if adjustment.present?
+              adjustment.destroy
+              order.updater.update
+            end
             ActiveMerchant::Billing::Response.new(false, Spree.t("iugu_credit_card_failure"), {}, authorization: charge.invoice_id)
           end
         end

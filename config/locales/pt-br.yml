@@ -23,4 +23,4 @@ pt-BR:
     iugu_credit_card_failure: "Infelizmente o seu pagamento não foi aprovado pela operadora de cartão. Tente com outro cartão ou com boleto bancário."
     iugu_credit_card_error: "Ocorreu um erro de comunicação, por favor tente novamente."
     iugu_error:
-      credit_card_invalid: "Cartão de crédito inválido"
+      credit_card_invalid: "A operadora de cartão de crédito retornou que o cartão digitado é invalido. Por favor, verifique os dados digitados ou tente com outro cartão ou finalize a compra com boleto bancário."
