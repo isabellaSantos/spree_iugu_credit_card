@@ -166,28 +166,40 @@ module Spree
     def void(response_code, _gateway_options)
       Iugu.api_key = preferred_api_key
       invoice = Iugu::Invoice.fetch response_code
-      if invoice.status == 'paid' or invoice.status == 'in_analysis'
+      return ActiveMerchant::Billing::Response.new(true, Spree.t('iugu_credit_card_void'), {}, authorization: response_code) if invoice.status == 'canceled'
+
+      if invoice.status == 'paid'
         if invoice.refund
           ActiveMerchant::Billing::Response.new(true, Spree.t('iugu_credit_card_void'), {}, authorization: response_code)
         else
           ActiveMerchant::Billing::Response.new(false, invoice.errors, {}, {})
         end
       else
-        ActiveMerchant::Billing::Response.new(true, Spree.t('iugu_credit_card_cancel'), {}, authorization: response_code)
+        if invoice.cancel
+          ActiveMerchant::Billing::Response.new(true, Spree.t('iugu_credit_card_void'), {}, authorization: response_code)
+        else
+          ActiveMerchant::Billing::Response.new(false, invoice.errors, {}, {})
+        end
       end
     end
 
     def cancel(response_code)
       Iugu.api_key = preferred_api_key
       invoice = Iugu::Invoice.fetch response_code
-      if invoice.status == 'paid' or invoice.status == 'in_analysis'
+      return ActiveMerchant::Billing::Response.new(true, Spree.t('iugu_credit_card_cancel'), {}, authorization: response_code) if invoice.status == 'canceled'
+
+      if invoice.status == 'paid'
         if invoice.refund
           ActiveMerchant::Billing::Response.new(true, Spree.t('iugu_credit_card_cancel'), {}, authorization: response_code)
         else
           ActiveMerchant::Billing::Response.new(false, invoice.errors, {}, {})
         end
       else
-        ActiveMerchant::Billing::Response.new(true, Spree.t('iugu_credit_card_cancel'), {}, authorization: response_code)
+        if invoice.cancel
+          ActiveMerchant::Billing::Response.new(true, Spree.t('iugu_credit_card_cancel'), {}, authorization: response_code)
+        else
+          ActiveMerchant::Billing::Response.new(false, invoice.errors, {}, {})
+        end
       end
     end
 
