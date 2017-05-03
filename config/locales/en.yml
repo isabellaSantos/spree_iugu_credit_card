@@ -18,6 +18,7 @@ en:
     iugu_credit_card_success: Transaction purchased successfully
     iugu_credit_card_void: Transaction voided successfully
     iugu_credit_card_cancel: Transaction canceled successfully
+    iugu_credit_card_capture: Transaction captured successfully
     iugu_credit_card_portion: Portion is required
     iugu_cc_adjustment_tax: Credit Card Tax
     iugu_credit_card_failure: Transaction failure

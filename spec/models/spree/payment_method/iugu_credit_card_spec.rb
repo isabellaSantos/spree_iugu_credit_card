@@ -12,12 +12,7 @@ describe Spree::PaymentMethod::IuguCreditCard, type: :model do
     expect(object.payment_source_class).to eq Spree::CreditCard
   end
 
-  it 'payment method should be auto captured' do
-    expect(object.auto_capture).to be_truthy
-  end
-
-  context 'purchase' do
-
+  context 'authorize' do
     let(:token_request) do
       {
         url: 'https://api.iugu.com/v1/payment_token',
@@ -33,6 +28,65 @@ describe Spree::PaymentMethod::IuguCreditCard, type: :model do
       }
       stub_iugu token_request
       stub_iugu charge_request
+      stub_iugu({ filename: 'fetch_invoice_in_analysis', method: :get,
+        url: "https://api.iugu.com/v1/invoices/ABCDEFGHIJKLMNOPQRSTUVWXYZ000001", body: '{}' })
+      object.update_attributes(auto_capture: false)
+      response = object.authorize '1599', credit_card, payment.gateway_options
+
+      expect(response.success?).to be_truthy
+      expect(response.authorization).to eq 'ABCDEFGHIJKLMNOPQRSTUVWXYZ000001'
+    end
+
+    context 'error' do
+      it 'should not purchase when Iugu return an error when create the token' do
+        token_request = {
+          url: 'https://api.iugu.com/v1/payment_token',
+          body: hash_including({'method' => 'credit_card'}),
+          filename: 'create_token_error'
+        }
+        stub_iugu token_request
+
+        object.update_attributes(auto_capture: false)
+        response = object.authorize '1599', credit_card, payment.gateway_options
+        expect(response.success?).to be_falsey
+      end
+
+      it 'should not purchase when Iugu return error' do
+        charge_request = {
+          body: hash_including({'token' => 'ABC19A61A78A4665914426EA752B0001'}),
+          filename: 'create_charge_error'
+        }
+        stub_iugu token_request
+        stub_iugu charge_request
+        stub_iugu({ filename: 'fetch_invoice', method: :get,
+          url: "https://api.iugu.com/v1/invoices/ABCDEFGHIJKLMNOPQRSTUVWXYZ000001", body: '{}' })
+
+        object.update_attributes(auto_capture: false)
+        response = object.authorize '1599', credit_card, payment.gateway_options
+        expect(response.success?).to be_falsey
+      end
+    end
+  end
+
+  context 'purchase' do
+    let(:token_request) do
+      {
+        url: 'https://api.iugu.com/v1/payment_token',
+        body: hash_including({'method' => 'credit_card'}),
+        filename: 'create_token'
+      }
+    end
+
+    it 'should create token and make the payment on Iugu' do
+      charge_request = {
+        body: hash_including({'token' => 'ABC19A61A78A4665914426EA752B0001'}),
+        filename: 'create_charge'
+      }
+      stub_iugu token_request
+      stub_iugu charge_request
+      stub_iugu({ filename: 'fetch_invoice', method: :get,
+        url: "https://api.iugu.com/v1/invoices/ABCDEFGHIJKLMNOPQRSTUVWXYZ000001", body: '{}' })
+      object.update_attributes(auto_capture: true)
       response = object.purchase '1599', credit_card, payment.gateway_options
 
       expect(response.success?).to be_truthy
@@ -48,6 +102,7 @@ describe Spree::PaymentMethod::IuguCreditCard, type: :model do
         }
         stub_iugu token_request
 
+        object.update_attributes(auto_capture: true)
         response = object.purchase '1599', credit_card, payment.gateway_options
         expect(response.success?).to be_falsey
       end
@@ -59,16 +114,35 @@ describe Spree::PaymentMethod::IuguCreditCard, type: :model do
         }
         stub_iugu token_request
         stub_iugu charge_request
+        stub_iugu({ filename: 'fetch_invoice', method: :get,
+          url: "https://api.iugu.com/v1/invoices/ABCDEFGHIJKLMNOPQRSTUVWXYZ000001", body: '{}' })
 
+        object.update_attributes(auto_capture: true)
         response = object.purchase '1599', credit_card, payment.gateway_options
         expect(response.success?).to be_falsey
       end
     end
+  end
 
+  context 'capture' do
+    it 'should capture successfully' do
+      response_code = '1'
+      stub_iugu({ filename: 'fetch_invoice_in_analysis', method: :get,
+        url: "https://api.iugu.com/v1/invoices/#{response_code}", body: '{}' })
+      stub_iugu({ filename: 'fetch_invoice', method: :post, body: '{}',
+                  url: "https://api.iugu.com/v1/invoices/#{response_code}/capture",
+                  headers: {'Accept'=>'*/*',
+                            'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+                            'Authorization'=>'Basic Og==',
+                            'Content-Type'=>'application/x-www-form-urlencoded',
+                            'User-Agent'=>'Iugu RubyLibrary'} })
+
+      response = object.capture 10, response_code, payment.gateway_options
+      expect(response.success?).to be_truthy
+    end
   end
 
   context 'void' do
-
     it 'should void successfully' do
       response_code = '1'
       stub_iugu({ filename: 'fetch_invoice', method: :get,
@@ -93,7 +167,6 @@ describe Spree::PaymentMethod::IuguCreditCard, type: :model do
   end
 
   context 'cancel' do
-
     it 'should void successfully' do
       response_code = '1'
       stub_iugu({ filename: 'fetch_invoice', method: :get,
@@ -118,7 +191,6 @@ describe Spree::PaymentMethod::IuguCreditCard, type: :model do
   end
 
   context 'calculating portions' do
-
     it 'should calculate portions without tax' do
       object.preferred_portions_without_tax = 5
       object.preferred_maximum_portions = 5
@@ -163,5 +235,4 @@ describe Spree::PaymentMethod::IuguCreditCard, type: :model do
       expect(portions[5]).to eq({portion: 6, value: 17.166666666666668, total: 103.0, tax_message: :iugu_with_tax})
     end
   end
-
 end
