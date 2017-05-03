@@ -148,6 +148,7 @@ module Spree
     end
 
     def capture(_amount, response_code, _gateway_options)
+      Iugu.api_key = preferred_api_key
       invoice = Iugu::Invoice.fetch(response_code)
 
       if invoice.status == 'paid'
@@ -155,32 +156,38 @@ module Spree
       else
         invoice = capture_invoice(response_code)
         if invoice.status == 'paid'
-          ActiveMerchant::Billing::Response.new(true, Spree.t('iugu_credit_card_capture'), {}, authorization: response_code)
+          return ActiveMerchant::Billing::Response.new(true, Spree.t('iugu_credit_card_capture'), {}, authorization: response_code)
         else
-          ActiveMerchant::Billing::Response.new(false, invoice.errors, {}, {})
+          return ActiveMerchant::Billing::Response.new(false, invoice.errors, {}, {})
         end
       end
     end
 
     def void(response_code, _gateway_options)
+      Iugu.api_key = preferred_api_key
       invoice = Iugu::Invoice.fetch response_code
-      if invoice.status == 'paid'
+      if invoice.status == 'paid' or invoice.status == 'in_analysis'
         if invoice.refund
           ActiveMerchant::Billing::Response.new(true, Spree.t('iugu_credit_card_void'), {}, authorization: response_code)
         else
           ActiveMerchant::Billing::Response.new(false, invoice.errors, {}, {})
         end
+      else
+        ActiveMerchant::Billing::Response.new(true, Spree.t('iugu_credit_card_cancel'), {}, authorization: response_code)
       end
     end
 
     def cancel(response_code)
+      Iugu.api_key = preferred_api_key
       invoice = Iugu::Invoice.fetch response_code
-      if invoice.status == 'paid'
+      if invoice.status == 'paid' or invoice.status == 'in_analysis'
         if invoice.refund
           ActiveMerchant::Billing::Response.new(true, Spree.t('iugu_credit_card_cancel'), {}, authorization: response_code)
         else
           ActiveMerchant::Billing::Response.new(false, invoice.errors, {}, {})
         end
+      else
+        ActiveMerchant::Billing::Response.new(true, Spree.t('iugu_credit_card_cancel'), {}, authorization: response_code)
       end
     end
 
