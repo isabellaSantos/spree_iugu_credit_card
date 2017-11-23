@@ -68,7 +68,11 @@ module Spree
       user_invoices = Iugu::Invoice.search(query: "email = '#{gateway_options[:email]}'").results
       user_invoices.each do |user_invoice|
         if user_invoice.status == successfull_status(user_invoice.status) && user_invoice.total_cents == order.display_total.cents
-          next if user_invoice.items.size != params[:items].size
+          next if Date.current != Date.parse(user_invoice.created_at_iso)
+          items_count = order.line_items.size
+          items_count += 1 if order.shipment_total > 0
+          items_count += order.adjustments.eligible.size
+          next if user_invoice.items.size != items_count
           save_order_total(order, payment_number) if adjustment.present?
           return ActiveMerchant::Billing::Response.new(true, Spree.t("iugu_credit_card_success"), {}, authorization: user_invoice.id)
         end
@@ -134,7 +138,11 @@ module Spree
       user_invoices = Iugu::Invoice.search(query: "email = '#{gateway_options[:email]}'").results
       user_invoices.each do |user_invoice|
         if user_invoice.status == successfull_status(user_invoice.status) && user_invoice.total_cents == order.display_total.cents
-          next if user_invoice.items.size != params[:items].size
+          next if Date.current != Date.parse(user_invoice.created_at_iso)
+          items_count = order.line_items.size
+          items_count += 1 if order.shipment_total > 0
+          items_count += order.adjustments.eligible.size
+          next if user_invoice.items.size != items_count
           save_order_total(order, payment_number) if adjustment.present?
           return ActiveMerchant::Billing::Response.new(true, Spree.t("iugu_credit_card_success"), {}, authorization: user_invoice.id)
         end
